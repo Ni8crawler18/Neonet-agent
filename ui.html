@@ -1,0 +1,257 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Neonet Vision Agent</title>
+<style>
+:root{--bg:#0a0c11;--panel:#11141c;--panel2:#161a24;--line:#222738;--fg:#e8eaf0;--mut:#89909f;
+--acc:#ff7a1a;--ok:#3ecf8e;--warn:#ffb020;--red:#f04848;--blue:#5aa2ff;--purple:#b98cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,Segoe UI,Inter,sans-serif}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.side{background:#0c0e14;border-right:1px solid var(--line);padding:16px 12px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:9px;padding:6px 8px 16px}
+.brand b{font-size:17px;letter-spacing:.02em}.brand .d{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--mut);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+.nav a:hover{background:var(--panel)}.nav a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 2px 0 0 var(--acc)}
+.nav .ic{width:16px;text-align:center;opacity:.8}
+.side .foot{position:absolute;bottom:14px;left:12px;right:12px;font-size:11px;color:var(--mut)}
+.topbar{display:flex;align-items:center;gap:12px;padding:13px 22px;border-bottom:1px solid var(--line);background:#0b0e14;position:sticky;top:0;z-index:5}
+.topbar h1{font-size:15px;margin:0;font-weight:600}.grow{flex:1}
+.chip{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--line);color:var(--mut);display:inline-flex;gap:6px;align-items:center}
+.chip b{color:var(--fg)}.chip .d{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.post-CALM{color:var(--ok);border-color:#204a37}.post-ELEVATED{color:var(--warn);border-color:#4a3c1a}.post-HIGH{color:var(--red);border-color:#4a1f1f}
+.wrap{padding:20px 22px;max-width:1340px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.g2,.g3,.g4,.app{grid-template-columns:1fr}.side{display:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tile .v{font-size:26px;font-weight:700;letter-spacing:-.02em}.tile .k{font-size:12px;color:var(--mut);margin-top:2px}
+.tile .v small{font-size:13px;color:var(--mut);font-weight:500}
+.video{background:#000;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.video img{width:100%;display:block}.video .cap{position:absolute;top:10px;left:10px;font-size:12px;background:rgba(0,0,0,.55);padding:3px 9px;border-radius:20px}
+.loop{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--mut);margin-top:10px}
+.loop span{background:var(--panel);border:1px solid var(--line);padding:3px 9px;border-radius:20px}
+.log{font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:320px;overflow:auto}
+.row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+.row .t{color:var(--mut);flex:none;width:60px}
+.badge{font-size:10.5px;padding:1px 6px;border-radius:4px;font-weight:700;flex:none;text-transform:uppercase}
+.b-perceive{background:#17314d;color:#8ec5ff}.b-decide{background:#2f2750;color:#c3a9ff}.b-act{background:#4d2727;color:#ff9a9a}
+.b-fuse{background:#143f2e;color:#8ff0bf}.b-human{background:#1f4a35;color:#8ff0bf}.b-monitor,.b-cv{background:#23283400;color:var(--mut);border:1px solid var(--line)}
+.bar{height:9px;border-radius:6px;background:var(--panel2);overflow:hidden}.bar>i{display:block;height:100%;border-radius:6px;background:var(--acc)}
+.st{display:grid;grid-template-columns:150px 1fr 54px;gap:10px;align-items:center;padding:4px 0;font-size:12.5px}
+.st .nm{color:var(--mut)}.st .ms{text-align:right;color:var(--fg);font-variant-numeric:tabular-nums}
+.tc{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.tc b{font-variant-numeric:tabular-nums}
+.inc{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}.inc.awaiting_approval{border-color:#4a2020;background:#140e0e}
+.inc .h{display:flex;align-items:center;gap:8px}.sev{font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:700;text-transform:uppercase}
+.sev.critical{background:#4d1b1b;color:#ff9a9a}.sev.warning{background:#4a3c17;color:#ffcf7a}.sev.advisory{background:#1f3a4d;color:#8ec5ff}
+.ctl{display:flex;gap:8px;margin-top:10px}button{flex:1;padding:8px;border:0;border-radius:7px;font-weight:600;cursor:pointer}
+.ap{background:var(--ok);color:#06220f}.di{background:var(--panel2);color:var(--fg)}
+.pill{font-size:11px;padding:2px 9px;border-radius:20px}.pill.dispatched{background:#143f2e;color:var(--ok)}.pill.dismissed{background:var(--panel2);color:var(--mut)}
+.gauge{margin:10px 0}.gauge .lab{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.gauge .lab b{font-size:13px}
+.muted{color:var(--mut)}.mono{font-family:ui-monospace,monospace}.flowline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:6px}
+.flowline .n{background:var(--panel2);border:1px solid var(--line);padding:3px 9px;border-radius:7px;color:var(--fg)}.flowline .ar{color:var(--acc)}
+.dot2{width:8px;height:8px;border-radius:50%;display:inline-block}
+.alertbar{display:none;padding:10px 22px;font-size:13px;font-weight:600;border-bottom:1px solid var(--line);position:sticky;top:51px;z-index:4}
+.alertbar.critical{display:block;background:#2a1012;color:#ff9a9a;box-shadow:inset 3px 0 0 var(--red)}
+.alertbar.warning{display:block;background:#2a2410;color:#ffcf7a;box-shadow:inset 3px 0 0 var(--warn)}
+.alertbar.ok{display:block;background:#102a1c;color:#8ff0bf;box-shadow:inset 3px 0 0 var(--ok)}
+.alertbar.info{display:block;background:#101f2a;color:#8ec5ff;box-shadow:inset 3px 0 0 var(--blue)}
+#bell{cursor:pointer}
+</style></head><body>
+<div class=app>
+  <aside class=side>
+    <div class=brand><span class=d></span><b>Neonet</b></div>
+    <nav class=nav id=nav>
+      <a href="#/overview"><span class=ic>▦</span> Overview</a>
+      <a href="#/beach"><span class=ic>◉</span> Beach feed</a>
+      <a href="#/sea"><span class=ic>≈</span> Sea-state feed</a>
+      <a href="#/pipeline"><span class=ic>⚙</span> OpenCV pipeline</a>
+      <a href="#/fusion"><span class=ic>⿻</span> Cross-feed reasoning</a>
+      <a href="#/incidents"><span class=ic>⚑</span> Incidents</a>
+    </nav>
+    <div class=foot>Agentic Vision · OpenCV <span id=cvf>5</span><br>Bluink Labs</div>
+  </aside>
+  <main>
+    <div class=topbar>
+      <h1 id=ttl>Overview</h1><span class=grow></span>
+      <span class=chip id=riskchip>Beach risk <b id=briskv>–</b></span>
+      <span class="chip" id=postchip>posture <b id=postv>–</b></span>
+      <a class=chip id=bell href="#/incidents">🔔 <b id=alertc>0</b></a>
+      <span class=chip><span class=d></span>OpenCV <b id=cvt>5</b></span>
+      <span class=chip id=clock></span>
+    </div>
+    <div id=alertbar class=alertbar></div>
+    <div class=wrap id=view></div>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const bc=s=>'b-'+s;
+let S=null, cur='';
+
+const views={
+ overview:{ttl:'Operations Overview',mount(){return `
+  <div class="grid g4" style="margin-bottom:16px">
+    <div class=tile><div class=v id=o_feeds>2</div><div class=k>Live feeds</div></div>
+    <div class=tile><div class=v id=o_tools>–</div><div class=k>OpenCV 5 tool calls</div></div>
+    <div class=tile><div class=v id=o_active>–</div><div class=k>Incidents awaiting approval</div></div>
+    <div class=tile><div class=v id=o_disp>–</div><div class=k>Lifeguards dispatched</div></div>
+  </div>
+  <div class="grid g2">
+    <div class=card><h3>Rushikonda Cove — Beach Cam</h3><div class=video><span class=cap>zone intrusion</span><img src="/stream/beach"></div>
+      <div class=loop><span id=o_bfps>–</span><span id=o_bppl>–</span></div></div>
+    <div class=card><h3>Offshore — Sea-State Cam</h3><div class=video><span class=cap>sea state / rip risk</span><img src="/stream/sea"></div>
+      <div class=loop><span id=o_sfps>–</span><span id=o_ssea>–</span></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class=card><h3>Beach risk index (fused)</h3>
+      <div class=gauge><div class=lab><span>Combined risk</span><b id=o_brv>–</b></div><div class=bar><i id=o_brbar style="width:0%"></i></div></div>
+      <div class=flowline><span class=n>Sea state</span><span class=ar>→</span><span class=n>Rip risk</span><span class=ar>→</span><span class=n>Posture</span><span class=ar>→</span><span class=n>Swimmers in zone</span><span class=ar>→</span><span class=n>Risk index</span></div>
+      <p class=muted id=o_brtx style="margin:12px 0 0"></p></div>
+    <div class=card><h3>Recent incidents</h3><div id=o_inc class=log></div></div>
+  </div>
+  <div class=card style="margin-top:16px"><h3>⚠ Alerts · operator notifications (SNS-ready)</h3><div id=o_alerts class=log></div></div>`},
+  update(s){ $('o_tools').textContent=s.total_tool_calls.toLocaleString();
+   $('o_active').textContent=s.counts.active; $('o_disp').textContent=s.counts.dispatched;
+   const b=s.feeds.beach,se=s.feeds.sea;
+   $('o_bfps').textContent=`beach ${b.fps} fps · ${b.proc_ms}ms/frame`; $('o_bppl').textContent=`${b.people} blobs · ${b.in_zone} in zone`;
+   $('o_sfps').textContent=`sea ${se.fps} fps · ${se.proc_ms}ms/frame`; $('o_ssea').textContent=`${se.sea_state.toUpperCase()} · rip ${se.rip_score}/100`;
+   $('o_brv').textContent=s.beach_risk; $('o_brbar').style.width=s.beach_risk+'%';
+   $('o_brbar').style.background=s.beach_risk>70?'var(--red)':s.beach_risk>45?'var(--warn)':'var(--ok)';
+   $('o_brtx').textContent=`Risk index fuses the offshore sea state (${s.posture.sea_state.toUpperCase()}, rip ${s.posture.rip_risk.toUpperCase()}) with ${b.in_zone} swimmer(s) in the restricted zone. Posture: ${s.posture.level}.`;
+   $('o_inc').innerHTML=s.incidents.slice(0,6).map(incLine).join('')||'<div class=muted>No incidents yet.</div>';
+   $('o_alerts').innerHTML=(s.alerts||[]).map(alertLine).join('')||'<div class=muted>No alerts.</div>';
+ }},
+
+ beach:{ttl:'Beach Feed — Agentic Vision',mount(){return `
+  <div class="grid g2">
+    <div>
+      <div class=video><span class=cap id=bcap>Rushikonda Cove</span><img src="/stream/beach"></div>
+      <div class=flowline><span class=n>1 perceive</span><span class=ar>→</span><span class=n>2 geofence</span><span class=ar>→</span><span class=n>3 inspect</span><span class=ar>→</span><span class=n>4 decide</span><span class=ar>→</span><span class=n>5 act</span><span class=ar>→</span><span class=n>6 human</span></div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class=tile><div class=v id=b_people>–</div><div class=k>moving blobs</div></div>
+        <div class=tile><div class=v id=b_zone>–</div><div class=k>in restricted zone</div></div>
+        <div class=tile><div class=v id=b_conf>–</div><div class=k>last ROI confidence</div></div>
+      </div>
+    </div>
+    <div>
+      <div class=card><h3>Agent reasoning trace</h3><div id=b_trace class=log></div></div>
+      <div class=card style="margin-top:16px"><h3>Incidents · human-in-the-loop</h3><div id=b_inc></div></div>
+    </div>
+  </div>`},
+  update(s){const b=s.feeds.beach;$('b_people').textContent=b.people;$('b_zone').textContent=b.in_zone;
+   $('b_conf').textContent=b.last_conf.toFixed(2);
+   $('b_trace').innerHTML=traceHtml(b.trace);
+   const mine=s.incidents.filter(i=>i.feed==='beach');
+   $('b_inc').innerHTML=mine.length?mine.map(incCard).join(''):'<div class=muted>Agent is watching the zone. No incidents.</div>';
+ }},
+
+ sea:{ttl:'Sea-State Feed',mount(){return `
+  <div class="grid g2">
+    <div><div class=video><span class=cap>Offshore sea-state cam</span><img src="/stream/sea"></div>
+      <div class=card style="margin-top:14px"><h3>OpenCV motion / whitewater mask</h3><div class=video><img src="/mask/sea"></div></div>
+    </div>
+    <div>
+      <div class=card><h3>Sea state</h3>
+        <div class=gauge><div class=lab><span>Sea state</span><b id=s_state>–</b></div></div>
+        <div class=gauge><div class=lab><span>Rip risk</span><b id=s_ripv>–</b></div><div class=bar><i id=s_ripbar style="width:0%"></i></div></div>
+        <div class=gauge><div class=lab><span>Whitewater coverage</span><b id=s_wwv>–</b></div><div class=bar><i id=s_wwbar style="width:0%;background:var(--blue)"></i></div></div>
+        <p class=muted id=s_tx style="margin-top:12px"></p>
+      </div>
+      <div class=card style="margin-top:16px"><h3>Sea-model trace</h3><div id=s_trace class=log></div></div>
+    </div>
+  </div>`},
+  update(s){const se=s.feeds.sea;
+   $('s_state').textContent=se.sea_state.toUpperCase();
+   $('s_state').style.color=se.sea_state==='rough'?'var(--red)':se.sea_state==='moderate'?'var(--warn)':'var(--ok)';
+   $('s_ripv').textContent=se.rip_score+'/100';$('s_ripbar').style.width=se.rip_score+'%';
+   $('s_ripbar').style.background=se.rip_score>62?'var(--red)':se.rip_score>38?'var(--warn)':'var(--ok)';
+   const ww=Math.round(se.whitewater*100);$('s_wwv').textContent=ww+'%';$('s_wwbar').style.width=Math.min(100,ww*2)+'%';
+   $('s_tx').textContent=`Surf energy from frame-differencing + whitewater thresholding (OpenCV 5). This drives the cross-feed risk posture: currently ${s.posture.level}.`;
+   $('s_trace').innerHTML=traceHtml(se.trace);
+ }},
+
+ pipeline:{ttl:'OpenCV 5 Pipeline',mount(){return `
+  <div class="grid g2">
+    <div class=card><h3>Beach pipeline — per-frame stages</h3><div id=p_bstg></div>
+      <div class=flowline style="margin-top:10px"><span class=n id=p_bfps>–</span><span class=n id=p_bms>–</span></div></div>
+    <div class=card><h3>Sea pipeline — per-frame stages</h3><div id=p_sstg></div>
+      <div class=flowline style="margin-top:10px"><span class=n id=p_sfps>–</span><span class=n id=p_sms>–</span></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class=card><h3>OpenCV 5 tool calls — cumulative</h3><div id=p_tools></div></div>
+    <div class=card><h3>Live pipeline log</h3><div id=p_log class=log></div></div>
+  </div>`},
+  update(s){ $('p_bstg').innerHTML=stagesHtml(s.feeds.beach.stages); $('p_sstg').innerHTML=stagesHtml(s.feeds.sea.stages);
+   $('p_bfps').textContent=`${s.feeds.beach.fps} fps`; $('p_bms').textContent=`${s.feeds.beach.proc_ms} ms/frame`;
+   $('p_sfps').textContent=`${s.feeds.sea.fps} fps`; $('p_sms').textContent=`${s.feeds.sea.proc_ms} ms/frame`;
+   const agg={}; for(const f of Object.values(s.feeds)) for(const[k,v]of Object.entries(f.tool_calls)) agg[k]=(agg[k]||0)+v;
+   $('p_tools').innerHTML=Object.entries(agg).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class=tc><span class=mono>cv2.${k}</span><b>${v.toLocaleString()}</b></div>`).join('');
+   const log=[...s.feeds.beach.pipeline.map(e=>({...e,f:'beach'})),...s.feeds.sea.pipeline.map(e=>({...e,f:'sea'}))].sort((a,b)=>a.t<b.t?1:-1).slice(0,16);
+   $('p_log').innerHTML=log.map(e=>`<div class=row><span class=t>${e.t}</span><span class="badge b-cv">${e.f}</span><span class=mono>${e.detail}</span></div>`).join('');
+ }},
+
+ fusion:{ttl:'Cross-Feed Reasoning',mount(){return `
+  <div class=card><h3>How the two feeds reason together</h3>
+   <div class=flowline style="font-size:13px">
+     <span class=n>Sea-State Cam</span><span class=ar>→</span><span class=n>sea state + rip risk</span><span class=ar>→</span>
+     <span class=n id=f_post>POSTURE</span><span class=ar>→</span><span class=n>Beach Cam decisions</span><span class=ar>→</span><span class=n>severity</span></div>
+   <p class=muted style="margin-top:12px">The offshore camera never sees a swimmer, and the beach camera never measures the surf. The agent fuses them: a swimmer entering the restricted zone is <b>advisory</b> under a calm sea but escalates to <b>CRITICAL</b> when the sea-state feed reports rough water with high rip risk.</p>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class=tile><div class=v id=f_sea>–</div><div class=k>offshore sea state</div></div>
+    <div class=tile><div class=v id=f_rip>–</div><div class=k>rip risk</div></div>
+    <div class=tile><div class=v id=f_lvl>–</div><div class=k>beach risk posture</div></div>
+  </div>
+  <div class=card style="margin-top:16px"><h3>Fusion decision log</h3><div id=f_log class=log></div></div>`},
+  update(s){ $('f_post').textContent=s.posture.level;
+   $('f_sea').textContent=s.posture.sea_state.toUpperCase();$('f_rip').textContent=s.posture.rip_risk.toUpperCase();
+   $('f_lvl').textContent=s.posture.level;
+   $('f_lvl').style.color=s.posture.level==='HIGH'?'var(--red)':s.posture.level==='ELEVATED'?'var(--warn)':'var(--ok)';
+   $('f_log').innerHTML=s.fusion.map(e=>`<div class=row><span class=t>${e.t}</span><span class="badge b-fuse">fuse</span><span>${e.detail}</span></div>`).join('')||'<div class=muted>Monitoring…</div>';
+ }},
+
+ incidents:{ttl:'Incidents',mount(){return `
+  <div class="grid g3" style="margin-bottom:16px">
+    <div class=tile><div class=v id=i_act>–</div><div class=k>awaiting approval</div></div>
+    <div class=tile><div class=v id=i_disp>–</div><div class=k>dispatched</div></div>
+    <div class=tile><div class=v id=i_dis>–</div><div class=k>dismissed</div></div>
+  </div>
+  <div class="grid g2"><div class=card><h3>All incidents · human-in-the-loop</h3><div id=i_list></div></div>
+  <div class=card><h3>⚠ Alert stream</h3><div id=i_alerts class=log></div></div></div>`},
+  update(s){ $('i_act').textContent=s.counts.active;$('i_disp').textContent=s.counts.dispatched;$('i_dis').textContent=s.counts.dismissed;
+   $('i_list').innerHTML=s.incidents.length?s.incidents.map(incCard).join(''):'<div class=muted>No incidents yet.</div>';
+   $('i_alerts').innerHTML=(s.alerts||[]).map(alertLine).join('')||'<div class=muted>No alerts.</div>';
+ }},
+};
+
+function traceHtml(tr){return tr.map(e=>`<div class=row><span class=t>${e.t}</span><span class="badge ${bc(e.step)}">${e.step}</span><span>${e.detail}${e.tool?` <span class=muted>· ${e.tool}</span>`:''}</span></div>`).join('')||'<div class=muted>waiting for activity…</div>';}
+function stagesHtml(st){const es=Object.entries(st);const mx=Math.max(0.1,...es.map(e=>e[1]));return es.map(([k,v])=>`<div class=st><span class=nm>${k}</span><div class=bar><i style="width:${Math.max(4,v/mx*100)}%"></i></div><span class=ms>${v} ms</span></div>`).join('')||'<div class=muted>warming up…</div>';}
+function incLine(i){return `<div class=row><span class="sev ${i.severity}">${i.severity}</span><span>#${i.id} ${i.feed_name.split('—')[0].trim()} — swimmer in zone</span><span class=grow></span><span class="pill ${i.status}">${i.status.replace('_',' ')}</span></div>`;}
+function incCard(i){const ctl=i.status==='awaiting_approval'
+  ?`<div class=ctl><button class=ap onclick="act(${i.id},'approve')">Approve · dispatch lifeguard</button><button class=di onclick="act(${i.id},'dismiss')">Dismiss</button></div>`
+  :`<span class="pill ${i.status}">${i.status.replace('_',' ')}</span>`;
+ return `<div class="inc ${i.status}"><div class=h><span class="sev ${i.severity}">${i.severity}</span><b>Incident #${i.id}</b><span class=muted>· ${i.feed_name}</span></div>
+  <div class=muted style="margin-top:4px">Swimmer confirmed in restricted water zone — confidence ${i.confidence}</div>${ctl}</div>`;}
+
+function alertLine(a){const c={critical:'var(--red)',warning:'var(--warn)',ok:'var(--ok)',info:'var(--blue)'}[a.level]||'var(--mut)';
+ return `<div class=row><span class=t>${a.t}</span><span class=dot2 style="background:${c};margin-top:6px"></span><span>${a.msg}</span></div>`;}
+
+async function act(id,d){await fetch(`/incident/${id}/${d}`,{method:'POST'});tick();}
+
+function route(){let h=(location.hash||'#/overview').slice(2);if(!views[h])h='overview';
+ if(h!==cur){cur=h;document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#/'+h));
+  $('ttl').textContent=views[h].ttl;$('view').innerHTML=views[h].mount();if(S)views[h].update(S);}}
+
+async function tick(){try{const r=await fetch('/state');S=await r.json();
+  $('cvt').textContent=S.cv;$('cvf').textContent=S.cv;$('clock').textContent=new Date().toLocaleTimeString();
+  $('briskv').textContent=S.beach_risk;$('postv').textContent=S.posture.level;
+  $('postchip').className='chip post-'+S.posture.level;
+  $('riskchip').style.color=S.beach_risk>70?'var(--red)':S.beach_risk>45?'var(--warn)':'var(--ok)';
+  const al=S.alerts||[];$('alertc').textContent=al.length;
+  const ab=$('alertbar'),a=al[0];
+  if(a){ab.className='alertbar '+a.level;ab.textContent=`${a.t} · ${a.msg}`;}else{ab.className='alertbar';ab.textContent='';}
+  if(views[cur])views[cur].update(S);}catch(e){}}
+
+window.addEventListener('hashchange',route);
+route();tick();setInterval(tick,1000);setInterval(()=>$('clock').textContent=new Date().toLocaleTimeString(),1000);
+</script></body></html>

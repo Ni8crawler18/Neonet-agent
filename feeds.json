@@ -1,0 +1,17 @@
+[
+  {
+    "id": "beach",
+    "name": "Rushikonda Cove — Beach Cam",
+    "role": "zone intrusion",
+    "kind": "beach",
+    "video": "media/demo.mp4",
+    "zone_frac": [[0.0, 0.32], [0.33, 0.28], [0.48, 1.0], [0.0, 1.0]]
+  },
+  {
+    "id": "sea",
+    "name": "Offshore — Sea-State Cam",
+    "role": "sea state / rip risk",
+    "kind": "sea",
+    "video": "media/demo2.mp4"
+  }
+]
